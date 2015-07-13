@@ -10,11 +10,9 @@
 #include"cube.hpp"
 #include"crf_train.hpp"
 
-void crf_test(const std::string& test_file, const std::string& template_file, const std::string& model_file)
+void crf_test(const std::string& test_file, const std::string& model_file, const std::string& output_file)
 {
-	Template crf_template(template_file);
 	Model model(model_file);
-	model.CRFtemplate = crf_template;
 	Example example(test_file);
 	Corpus corpus(model, example);
 
@@ -38,7 +36,6 @@ void crf_test(const std::string& test_file, const std::string& template_file, co
 		item.resize(labelSize);
 
 	std::vector<int> labelpath(corpus.sentence_max_length);
-	std::string output_file = "data/classification";
 	std::ofstream out(output_file);
 	if (!out.is_open()){
 		std::cout << "failed to open file " << output_file << std::endl;

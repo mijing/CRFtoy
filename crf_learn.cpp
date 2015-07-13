@@ -1,4 +1,4 @@
-﻿#include<iostream>
+﻿/*#include<iostream>
 #include<string>
 #include "crf_train.hpp"
 int main(int argc, char* argv[])
@@ -22,4 +22,4 @@ int main(int argc, char* argv[])
 	crf_train(train_file, template_file, model_file);
 
 	return 0;
-}
+}*/

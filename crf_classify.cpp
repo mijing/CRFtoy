@@ -1,4 +1,4 @@
-/*#include<iostream>
+#include<iostream>
 #include<string>
 #include "crf_test.hpp"
 int main(int argc, char* argv[])
@@ -21,4 +21,4 @@ int main(int argc, char* argv[])
 	crf_test(test_file, model_file, result_file);
 
 	return 0;
-}*/
+}
