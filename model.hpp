@@ -36,6 +36,35 @@ public:
 			in >> label >> id;
 			this->labelMap.add(label, id);
 		}
+		//read template
+		in >> size;
+		bool isBigram = false;
+		while (size-- > 0)
+		{
+			std::string line;
+			if (!getline(in, line))
+			{
+				std::cout << "Number of template lines does not match" << std::endl;
+			}
+			if (line == "# Unigram")
+			{
+				isBigram = false;
+				continue;
+			}
+			if (line == "# Bigram")
+			{
+				isBigram = true;
+				continue;
+			}
+			if (line == "")
+				continue;
+			if (!isBigram)
+				this->CRFtemplate.unigrams.push_back(Unigram(line));
+			else
+				this->CRFtemplate.bigrams.push_back(Bigram(line));
+		}
+		this->CRFtemplate.unigrams.shrink_to_fit();
+		this->CRFtemplate.bigrams.shrink_to_fit();
 		//read id map
 		in >> size;
 		while (size-- > 0)
@@ -118,12 +147,39 @@ public:
 			std::cout << "Failed to open file " << filename << std::endl;
 			exit(1);
 		}
+
 		//write label map;
 		out << labelMap.labelMap.size() << std::endl;
 		for (auto&item : this->labelMap.labelMap)
 		{
 			out << item.first << "\t" << item.second << std::endl;
 		}
+
+		//write template
+		out << this->CRFtemplate.bigrams.size() + this->CRFtemplate.unigrams.size() + 2 << std::endl;
+		out << "# Unigram:" << std::endl;
+		for (auto& unigram : this->CRFtemplate.unigrams)
+		{
+			std::string str = unigram.prefix+":";
+			for (auto& item : unigram.items)
+			{
+				str += "%x[" + std::to_string(item.row) + "," + std::to_string(item.column) + "]/";
+			}
+			str.pop_back();
+			out << str << std::endl;
+		}
+		out << "# Bigram" << std::endl;
+		for (auto& bigram : this->CRFtemplate.bigrams)
+		{
+			std::string str = bigram.prefix + ":";
+			for (auto& item : bigram.items)
+			{
+				str += "%x[" + std::to_string(item.row) + "," + std::to_string(item.column) + "]/";
+			}
+			str.pop_back();
+			out << str << std::endl;
+		}
+		
 		//write id map
 		out << idMap.idmap.size() << std::endl;
 		std::set<size_t> ids;
@@ -139,6 +195,7 @@ public:
 				}
 			}
 		}
+
 		//write weights
 		out << weight_size << std::endl;
 		for (int i = 0; i < this->weight_size; ++i)
@@ -146,41 +203,6 @@ public:
 			out << weight[i] << std::endl;
 		}
 
-		/*
-		for (auto& item : this->idMap.idmap)
-		{
-			if (item.first[0] == 'U')
-			{
-				for (auto& label : this->labelMap.labelMap)
-				{
-					size_t id = item.second + label.second;
-					out << item.first << "%x" << label.first << ": " << weight[id] << endl;
-					if (ids.find(id) != ids.end())
-					{
-						cout << item.first << "%x" << label.first << ": " << endl;
-						cout << id << endl;
-					}
-					ids.insert(id);
-				}
-			}
-			else
-			{
-				for (auto& ll : this->labelMap.labelMap)
-				{
-					for (auto& lr : this->labelMap.labelMap)
-					{
-						size_t id = item.second + labelMap.getId(ll.second, lr.second);
-						out << item.first << "%x" << ll.first << "%x"
-							<< lr.first << ": " << weight[id] << endl;
-						if (ids.find(id) != ids.end()){
-							cout << item.first << "%x" << ll.first << "%x" << lr.first << ": " << endl;
-							cout << id << endl;
-						}
-						ids.insert(id);
-					}
-				}
-			}
-		}*/
 		out.close();
 	}
 };

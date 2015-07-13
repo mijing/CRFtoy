@@ -275,7 +275,7 @@ void train(Corpus& corpus, Model& model)
 		gradient = new double[model.get_weight_size()];
 	}
 
-	for (int i = 0; i < 100; ++i)
+	for (int i = 0; i < 50; ++i)
 	{
 		std::cout << "iter " << i << std::endl;
 		std::vector<std::thread> threads;

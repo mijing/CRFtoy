@@ -1,6 +1,6 @@
 CFLAGS=-std=c++11
 
-all: crf_classify crf_learn
+all: crf_classify crf_learn clean
 .PHONY: all
 
 objects=crf_learn.o corpus.o crf_train.o example.o idMap.o labelMap.o \
@@ -61,3 +61,5 @@ crf_test.o: crf_test.hpp template.hpp model.hpp idMap.hpp \
  matrix.hpp cube.hpp crf_train.hpp
 	g++ $(CFLAGS) -c crf_test.cpp
 	
+clean:
+	rm *.o
