@@ -110,12 +110,30 @@ public:
 	Template(const std::string& filename)
 	{
 		this->ReadTemplateFile(filename);
+		this->bigrams.shrink_to_fit();
+		this->unigrams.shrink_to_fit();
 		this->SetColumnSize();
 	}
 
 	Template(std::vector<std::string>& lines)
 	{
-		
+		bool isBigram = false;
+		for (std::string& line:lines)
+		{
+			if (line == "# Unigram")
+				isBigram = false;
+			else if (line == "# Bigram")
+				isBigram = true;
+			else if (line == "")
+				continue;
+			else if (isBigram)
+				this->bigrams.push_back(Bigram(line));
+			else
+				this->unigrams.push_back(Unigram(line));
+		}
+		this->bigrams.shrink_to_fit();
+		this->unigrams.shrink_to_fit();
+		this->SetColumnSize();
 	}
 
 	size_t GetColumnSize()
@@ -149,7 +167,8 @@ private:
 		for (std::string tmp; getline(infp, tmp);)
 		{
 			std::cout << tmp << std::endl;
-			if (tmp != "")bilines.push_back(tmp);
+			if (tmp != "")
+				bilines.push_back(tmp);
 		}
 		//get unigrams and bigrams
 		for (auto& line:unilines)

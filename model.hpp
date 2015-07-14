@@ -38,34 +38,18 @@ public:
 		}
 		//read template
 		in >> size;
-		bool isBigram = false;
+		std::vector<std::string> lines;
 		while (size-- > 0)
 		{
 			std::string line;
-			if (!getline(in, line))
-			{
-				std::cout << "Number of template lines does not match" << std::endl;
-			}
-			if (line == "# Unigram")
-			{
-				isBigram = false;
-				continue;
-			}
-			if (line == "# Bigram")
-			{
-				isBigram = true;
-				continue;
-			}
-			if (line == "")
-				continue;
-			if (!isBigram)
-				this->CRFtemplate.unigrams.push_back(Unigram(line));
-			else
-				this->CRFtemplate.bigrams.push_back(Bigram(line));
+			do{
+				getline(in, line);
+			} while (line == "");
+			lines.push_back(line);
 		}
-		this->CRFtemplate.unigrams.shrink_to_fit();
-		this->CRFtemplate.bigrams.shrink_to_fit();
+		this->CRFtemplate = Template(lines);
 		//read id map
+
 		in >> size;
 		while (size-- > 0)
 		{
@@ -157,7 +141,7 @@ public:
 
 		//write template
 		out << this->CRFtemplate.bigrams.size() + this->CRFtemplate.unigrams.size() + 2 << std::endl;
-		out << "# Unigram:" << std::endl;
+		out << "# Unigram" << std::endl;
 		for (auto& unigram : this->CRFtemplate.unigrams)
 		{
 			std::string str = unigram.prefix+":";
