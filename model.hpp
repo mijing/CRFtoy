@@ -1,9 +1,9 @@
 #ifndef MODEL
 #define MODEL
 
-#include "idMap.hpp"
+#include "idmap.hpp"
 #include "template.hpp"
-#include "labelMap.hpp"
+#include "labelmap.hpp"
 #include<assert.h>
 #include<fstream>
 #include<cstring>

@@ -6,8 +6,8 @@
 #include<iostream>
 
 #include "lib/print.hpp"
-#include "labelMap.hpp"
-#include "idMap.hpp"
+#include "labelmap.hpp"
+#include "idmap.hpp"
 #include "model.hpp"
 #include "template.hpp"
 #include "example.hpp"
