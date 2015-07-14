@@ -303,10 +303,14 @@ void train(Corpus& corpus, Model& model)
 
 void crf_train(std::string train_file, std::string template_file, std::string model_file)
 {
+	std::cout << "read train file to example" << std::endl;
 	Example example(train_file);
+	std::cout << "read template file" << std::endl;
 	Template crf_template(template_file);
+	std::cout << "example to corpus" << std::endl;
 	Corpus corpus(crf_template, example);
 	Model model(corpus.idMap, crf_template, corpus.labelMap);
+	std::cout << "train model" << std::endl;
 	train(corpus, model);
 	model.write(model_file);
 	return;

@@ -1,65 +1,65 @@
-CFLAGS=-std=c++11
+CFLAGS=-pthread -std=c++11 
 
 all: crf_classify crf_learn clean
 .PHONY: all
 
-objects=crf_learn.o corpus.o crf_train.o example.o idmap.o labelmap.o \
+learnobjs=crf_learn.o corpus.o crf_train.o example.o idmap.o labelmap.o \
  model.o template.o print.o string_lib.o
-crf_learn:$(objects)
-	g++ -o crf_learn $(objects)
+crf_learn:$(learnobjs)
+	g++ -o crf_learn $(learnobjs) $(CFLAGS) -Wl,--no-as-needed
 
-objects=crf_classify.o corpus.o crf_train.o example.o idmap.o labelmap.o \
+classobjs=crf_classify.o corpus.o crf_train.o example.o idmap.o labelmap.o \
  model.o template.o print.o string_lib.o crf_test.o
-crf_classify: $(objects)
-	g++ -o crf_classify $(objects)
+crf_classify: $(classobjs)
+	g++ -o crf_classify $(classobjs) $(CFLAGS) -Wl,--no-as-needed
 
 crf_classify.o: crf_test.hpp
-	g++ $(CFLAGS) -c crf_classify.cpp
+	g++ -c crf_classify.cpp $(CFLAGS)
 
 crf_learn.o: crf_train.hpp example.hpp lib/print.hpp \
  lib/string_lib.hpp model.hpp idmap.hpp template.hpp labelmap.hpp \
  corpus.hpp
-	g++ $(CFLAGS) -c crf_learn.cpp
+	g++ -c crf_learn.cpp $(CFLAGS)
 
 corpus.o: corpus.hpp lib/print.hpp labelmap.hpp idmap.hpp
-	g++ $(CFLAGS) -c corpus.cpp
+	g++ -c corpus.cpp $(CFLAGS)
 
 crf_train.o: example.hpp lib/print.hpp lib/string_lib.hpp \
  template.hpp corpus.hpp labelmap.hpp idmap.hpp crf_train.hpp model.hpp \
  matrix.hpp cube.hpp
-	g++ $(CFLAGS) -c crf_train.cpp
+	g++ -c crf_train.cpp $(CFLAGS)
 
 cube.o: cube.hpp
-	g++ $(CFLAGS) -c cube.cpp
+	g++ -c cube.cpp $(CFLAGS)
 
 example.o: example.hpp lib/print.hpp lib/string_lib.hpp
-	g++ $(CFLAGS) -c example.cpp
+	g++ -c example.cpp $(CFLAGS)
 
 idmap.o: idmap.hpp
-	g++ $(CFLAGS) -c idmap.cpp
+	g++ -c idmap.cpp $(CFLAGS)
 	
 labelmap.o: labelmap.hpp
-	g++ $(CFLAGS) -c labelmap.cpp
+	g++ -c labelmap.cpp $(CFLAGS)
 
 matrix.o: matrix.hpp
-	g++ $(CFLAGS) -c matrix.cpp
+	g++ -c matrix.cpp $(CFLAGS)
 
 model.o: model.hpp idmap.hpp template.hpp labelmap.hpp
-	g++ $(CFLAGS) -c model.cpp 
+	g++ -c model.cpp  $(CFLAGS)
 
 template.o: template.hpp
-	g++ $(CFLAGS) -c template.cpp
+	g++ -c template.cpp $(CFLAGS)
 
 print.o: lib/print.hpp
-	g++ $(CFLAGS) -c lib/print.cpp
+	g++ -c lib/print.cpp $(CFLAGS)
 	
 string_lib.o: lib/string_lib.hpp
-	g++ $(CFLAGS) -c lib/string_lib.cpp
+	g++ -c lib/string_lib.cpp $(CFLAGS)
 	
 crf_test.o: crf_test.hpp template.hpp model.hpp idmap.hpp \
  labelmap.hpp corpus.hpp lib/print.hpp example.hpp lib/string_lib.hpp \
  matrix.hpp cube.hpp crf_train.hpp
-	g++ $(CFLAGS) -c crf_test.cpp
+	g++ -c crf_test.cpp $(CFLAGS)
 	
 clean:
 	rm *.o

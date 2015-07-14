@@ -59,6 +59,11 @@ public:
 		this->ReadExampleFile(file_name);
 		this->set_columnSize();
 	}
+	~Example()
+	{
+		for (auto tmp : this->sentences)
+			delete tmp;
+	}
 
 	void ReadExampleFile(const std::string& file_name)
 	{
