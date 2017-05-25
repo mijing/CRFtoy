@@ -1,14 +1,15 @@
 #ifndef IDMAP
 #define IDMAP
 
-#include<map>
-#include<string>
-#include<algorithm>
+#include <map>
+#include <string>
+#include <algorithm>
 
 class IdMap
 {
 public:
 	std::map<std::string, size_t> idmap;
+private:
 	size_t maxId; // the max feature id; 
 	size_t step;
 public:
@@ -25,7 +26,7 @@ public:
 			this->idmap.insert(std::pair<std::string, size_t>(feature, this->maxId));
 			int result = this->maxId;
 			if (isBigram)
-				this->maxId += this->step*this->step;
+				this->maxId += (this->step+1) * this->step;
 			else
 				this->maxId += this->step;
 			return result;

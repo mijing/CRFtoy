@@ -40,7 +40,7 @@ protected:
 		size_t index = line.find(":");
 		if (index == std::string::npos)
 		{
-			this->print_error_message(line);
+			this->prefix = line;
 			return;
 		}
 		this->prefix = line.substr(0, index);
@@ -85,6 +85,8 @@ private:
 public:
 	std::vector<Unigram> unigrams;
 	std::vector<Bigram> bigrams;
+    std::vector<std::string> _unilines;
+    std::vector<std::string> _bilines;
 private:
 	void SetColumnSize()
 	{
@@ -98,9 +100,10 @@ private:
 
 		for (auto& bigram : this->bigrams)
 		{
-			for (auto& item : bigram.items)
+			for (auto& item : bigram.items) {
 				if (item.column > this->columnSize)
 					this->columnSize = item.column;
+            }
 		}
 	}
 
@@ -145,37 +148,42 @@ private:
 	void ReadTemplateFile(const std::string& filename)
 	{
 		std::ifstream infp(filename);
-		if (!infp.is_open()){
+		if (!infp.is_open()) {
 			std::cout << "Failed to open file " << filename << std::endl;
 			return;
 		}
-		//get unilines and bilines
-		std::vector<std::string> unilines;
-		std::vector<std::string> bilines;
-		for (std::string tmp; getline(infp, tmp);)
+
+        int num = 0;
+		for (std::string tmp; getline(infp, tmp); ++num)
 		{
-			if (tmp == "# Unigram")
-				break;
+            if (tmp.size() == 0) {
+                continue;
+            }
+            switch (tmp[0]) {
+                case '#':
+                    break;
+                case 'U':
+                    _unilines.push_back(tmp);
+                    break;
+                case 'B':
+                    _bilines.push_back(tmp);
+                    break;
+                default:
+                    std::cout << "line " << num <<
+                        " in template file is wrong: " << tmp << std::endl;
+                    break;
+            }
 		}
-		for (std::string tmp; getline(infp, tmp);)
-		{
-			if (tmp == "# Bigram")
-				break;
-			if (tmp != "")
-				unilines.push_back(tmp);
-		}
-		for (std::string tmp; getline(infp, tmp);)
-		{
-			std::cout << tmp << std::endl;
-			if (tmp != "")
-				bilines.push_back(tmp);
-		}
+
 		//get unigrams and bigrams
-		for (auto& line:unilines)
+        this->unigrams.reserve(_unilines.size());
+		for (auto& line : _unilines)
 		{
 			this->unigrams.push_back(Unigram(line));
 		}
-		for (auto& line:bilines)
+
+        this->bigrams.reserve(_bilines.size());
+		for (auto& line : _bilines)
 		{
 			this->bigrams.push_back(Bigram(line));
 		}

@@ -5,6 +5,10 @@
 #include<assert.h>
 #include<iostream>
 #include"print.hpp"
+
+/*
+ * it will print error massage in red if it is windows
+ * */
 void PrintError(std::string str)
 {
 #ifdef WINDOWS

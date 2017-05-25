@@ -17,8 +17,10 @@ void crf_test(const std::string& test_file, const std::string& model_file, const
 	Corpus corpus(model, example);
 
 	const int labelSize = model.labelMap.getMaxId() + 1;
+    const int special_start_id = model.labelMap.getMaxId() + 1;
+
 	std::vector<std::vector<double>> psi_uf(corpus.sentence_max_length);
-	for(auto& item:psi_uf)
+	for(auto& item : psi_uf)
 		item.resize(labelSize);
 	std::vector<std::vector<std::vector<double>>> psi(corpus.sentence_max_length);
 	for (auto& item : psi)
@@ -46,41 +48,57 @@ void crf_test(const std::string& test_file, const std::string& model_file, const
 		auto& tokens = sentence.tokens;
 		for (int j = 0; j < tokens.size(); ++j)
 		{
-			for (int label = 2; label <= model.labelMap.getMaxId(); ++label)
+			for (int label = 0; label <= model.labelMap.getMaxId(); ++label)
 			{
-				psi_uf[j][label] = get_psi_uf(tokens[j], label, model, true);
+				psi_uf[j][label] = get_psi_uf(tokens[j],
+                        label,
+                        model.weight,
+                        model.get_weight_size(),
+                        true);
 			}
 		}
 
 		for (int j = 0; j < tokens.size(); j++)
 		{
 			double max = -std::numeric_limits<double>::max();
-			for (int lr = 2; lr <= model.labelMap.getMaxId(); ++lr)
+			for (int lr = 0; lr <= model.labelMap.getMaxId(); ++lr)
 			{
 				if (0 == j)
 				{
-					const int ll = model.labelMap.get_start_id();
-					psi[j][ll][lr] = psi_uf[j][lr] + get_psi_bf(tokens[j], ll, lr, model, true);
+					const int ll = 0; // model.labelMap.get_start_id();
+					psi[j][ll][lr] = psi_uf[j][lr] + 
+                        get_psi_bf(tokens[j],
+                                special_start_id, lr,
+                                model.weight,
+                                model.get_weight_size(),
+                                corpus.labelMap,
+                                true);
 					max = std::max(max, psi[j][ll][lr]);
 				}
 				else
 				{
-					for (int ll = 2; ll <= model.labelMap.getMaxId(); ++ll)
+					for (int ll = 0; ll <= model.labelMap.getMaxId(); ++ll)
 					{
-						psi[j][ll][lr] = psi_uf[j][lr] + get_psi_bf(tokens[j], ll, lr, model, true);
+						psi[j][ll][lr] = psi_uf[j][lr] + 
+                            get_psi_bf(tokens[j],
+                                    ll, lr,
+                                    model.weight,
+                                    model.get_weight_size(),
+                                    corpus.labelMap,
+                                    true);
 						max = std::max(max, psi[j][ll][lr]);
 					}
 				}
 			}
-			for (int lr = 2; lr <= model.labelMap.getMaxId(); ++lr)
+			for (int lr = 0; lr <= model.labelMap.getMaxId(); ++lr)
 			{
 				if (0 == j)
 				{
-					const int ll = model.labelMap.get_start_id();
+					const int ll = 0; // model.labelMap.get_start_id();
 					psi[j][ll][lr] = exp(psi[j][ll][lr] - max);
 				}
 				else{
-					for (int ll = 2; ll <= model.labelMap.getMaxId(); ++ll)
+					for (int ll = 0; ll <= model.labelMap.getMaxId(); ++ll)
 						psi[j][ll][lr] = exp(psi[j][ll][lr] - max);
 				}
 			}
@@ -88,18 +106,18 @@ void crf_test(const std::string& test_file, const std::string& model_file, const
 		//Viterbi algorithm
 		for (int i = 0; i < tokens.size(); ++i)
 		{
-			for (int lr = 2; lr < labelSize; ++lr)
+			for (int lr = 0; lr < labelSize; ++lr)
 			{
 				if (0==i)
 				{
-					const int ll = model.labelMap.get_start_id();
+					const int ll = 0; // model.labelMap.get_start_id();
 					previous[i][lr] = psi[i][ll][lr];
 					from[i][lr] = ll;
 				}
 				else{
 					double max = -std::numeric_limits<double>::max();
 					int label;
-					for (int ll = 2; ll < labelSize; ++ll)
+					for (int ll = 0; ll < labelSize; ++ll)
 					{
 						double tmp = previous[i-1][ll] * psi[i][ll][lr];
 						if (max < tmp)
@@ -117,7 +135,7 @@ void crf_test(const std::string& test_file, const std::string& model_file, const
 
 		int label;
 		double max = -std::numeric_limits<double>::max();
-		for (int i = 2; i < labelSize; ++i)
+		for (int i = 0; i < labelSize; ++i)
 		{
 			if (max < previous[tokens.size() - 1][i])
 			{

@@ -14,17 +14,27 @@
 class Word
 {
 public:
-	std::vector<std::string> row_features;
+	std::vector<std::string> _row_features;
+    static int ROW_FEATURES_SIZE;
 public:
-	Word(std::string line)
+	Word(std::string& line)
 	{
+        _row_features.reserve(ROW_FEATURES_SIZE);
 		std::stringstream ss(line);
-		for (std::string tmp; ss >> tmp; this->row_features.push_back(tmp));
+        int num = 0;
+		for (std::string tmp; ss >> tmp; _row_features.push_back(tmp))
+            ++num;
+        if (ROW_FEATURES_SIZE == 0) {
+            ROW_FEATURES_SIZE = num;
+        }
+        else if (ROW_FEATURES_SIZE != num) {
+
+        }
 	}
 
 	std::vector<std::string>& get_row_features()
 	{
-		return this->row_features;
+		return _row_features;
 	}
 };
 
@@ -35,6 +45,7 @@ public:
 public:
 	RowSentence(std::vector<std::string>& lines)
 	{
+        words.reserve(lines.size()); // faster
 		for (auto& line:lines)
 		{
 			this->words.push_back(Word(line));
@@ -68,12 +79,12 @@ public:
 	void ReadExampleFile(const std::string& file_name)
 	{
 		std::ifstream fp(file_name);
-		if (!fp.is_open()){
+		if (!fp.is_open()) {
 			std::cout << "Failed to open file " << file_name << std::endl;
 			exit(1);
 		}
-		std::vector<std::string>lines;
-		for (std::string line; getline(fp, line);) // getline cannot work
+		std::vector<std::string> lines;
+		for (std::string line; getline(fp, line);)
 		{
 			if (trim(line) != "")
 				lines.push_back(line);
@@ -91,7 +102,7 @@ public:
 		fp.close();
 	}
 
-	int get_columnSize()const
+	int get_columnSize() const
 	{
 		return this->columnSize;
 	}
@@ -108,7 +119,10 @@ public:
 			{
 				if (this->columnSize != words[j].get_row_features().size())
 				{
-					PrintError("file with wrong format, number of clumns is different. columnSize is " + std::to_string(this->columnSize) + ", and current column size is " + std::to_string(words[j].get_row_features().size()));
+					PrintError("file with wrong format, number of clumns is different. columnSize is "
+                            + std::to_string(this->columnSize) +
+                            ", and current column size is " +
+                            std::to_string(words[j].get_row_features().size()));
 					exit(1);
 				}
 			}

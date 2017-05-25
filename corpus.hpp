@@ -69,16 +69,20 @@ public:
 		}
 	}
 
-	int getFeatureId(const RowSentence& rSentence, Sentence& sentence, const Unigram& ugram, size_t i, bool isBigram=false)
+	int getFeatureId(const RowSentence& rSentence,
+            Sentence& sentence,
+            const Unigram& ugram,
+            size_t i,
+            bool isBigram=false)
 	{
 		std::string feature = ugram.prefix + ":";
 		for (size_t k = 0; k < ugram.items.size(); k++)
 		{
 			const Item& item = ugram.items[k];
-			if (item.row + i >= 0 && item.row + i < rSentence.words.size() &&
-				item.column >= 0 && item.column < rSentence.words[item.row + i].row_features.size())
+			if (item.row + i >= 0 && item.row + i < rSentence.words.size() && item.column >= 0
+                    && item.column < rSentence.words[item.row + i]._row_features.size())
 			{
-				feature += "%x" + rSentence.words[item.row + i].row_features[item.column];
+				feature += "%x" + rSentence.words[item.row + i]._row_features[item.column];
 			}
 			else
 			{
@@ -88,7 +92,10 @@ public:
 		return this->idMap.getId(feature, isBigram);
 	}
 
-	void RowSentence2Sentence(const RowSentence& rSentence, Sentence& sentence, const Template& CRFtemplate)
+	void RowSentence2Sentence(const RowSentence& rSentence,
+            Sentence& sentence,
+            const Template& CRFtemplate,
+            bool is_test = false)
 	{
 		sentence.tokens.resize(rSentence.words.size());
 		for (size_t i = 0; i < rSentence.words.size(); i++)
@@ -96,15 +103,21 @@ public:
 			sentence.tokens[i].ugramFeatures.resize(CRFtemplate.unigrams.size());
 			for (size_t j = 0; j < CRFtemplate.unigrams.size(); j++)
 			{
-				sentence.tokens[i].ugramFeatures[j] = this->getFeatureId(rSentence, sentence, CRFtemplate.unigrams[j], i);
+				sentence.tokens[i].ugramFeatures[j] = 
+                    this->getFeatureId(rSentence, sentence, CRFtemplate.unigrams[j], i);
 			}
 
 			sentence.tokens[i].bgramFeatures.resize(CRFtemplate.bigrams.size());
 			for (size_t j = 0; j < CRFtemplate.bigrams.size(); j++)
 			{
-				sentence.tokens[i].bgramFeatures[j] = this->getFeatureId(rSentence, sentence, CRFtemplate.bigrams[j], i, true);
+				sentence.tokens[i].bgramFeatures[j] = 
+                    this->getFeatureId(rSentence, sentence, CRFtemplate.bigrams[j], i, true);
 			}
-			sentence.tokens[i].label = this->labelMap.getId(rSentence.words[i].row_features[this->column_szie-1]);
+			if (is_test)
+                sentence.tokens[i].label = -1; 
+            else
+                sentence.tokens[i].label =
+                    this->labelMap.getId(rSentence.words[i]._row_features[this->column_szie-1]);
 		}
 	}
 
@@ -125,18 +138,18 @@ public:
 		{
 			for (auto& word:sentence->words)
 			{
-				const std::string& label = *(word.row_features.end() - 1);
-				this->labelMap.getId(label,true);
+				const std::string& label = *(word._row_features.end() - 1);
+				this->labelMap.getId(label, true);
 			}
 		}
-		this->idMap.setStep(this->labelMap.getMaxId()+1);
+		this->idMap.setStep(this->labelMap.getMaxId() + 1);
 		this->sentences.resize(example.sentences.size());
-		for (size_t i = 0; i < example.sentences.size(); i++)
+		for (size_t i = 0; i < example.sentences.size(); ++i)
 		{
 			this->RowSentence2Sentence(*(example.sentences[i]), this->sentences[i], CRFtemplate);
 		}
-		this->labelMap.getId("*");
-		this->labelMap.getId("#");
+		// this->labelMap.getId("*");
+		// this->labelMap.getId("#");
 		this->set_sentence_max_length();
 	}
 
@@ -151,20 +164,22 @@ public:
 		{
 			for (auto& word : sentence->words)
 			{
-				const std::string& label = *(word.row_features.end() - 1);
-				this->labelMap.getId(label, true);
+				const std::string& label = *(word._row_features.end() - 1);
 			}
 		}
 		this->idMap.setStep(this->labelMap.getMaxId() + 1);
 		this->sentences.resize(example.sentences.size());
 		for (size_t i = 0; i < example.sentences.size(); i++)
 		{
-			this->RowSentence2Sentence(*(example.sentences[i]), this->sentences[i], CRFtemplate);
+			this->RowSentence2Sentence(
+                    *(example.sentences[i]),
+                    this->sentences[i],
+                    CRFtemplate,
+                    true);
 		}
-		this->labelMap.getId("*");
-		this->labelMap.getId("#");
+		// this->labelMap.getId("*");
+		// this->labelMap.getId("#");
 		this->set_sentence_max_length();
-
 	}
 
 };
