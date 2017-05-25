@@ -3,7 +3,7 @@ CRFtoy is another CRF tool writing in c++ which is optimized with L-BFGS and OW
 Optimize L2 regularization with L-BFGS and L1 with OWLQN
 
 ## How to make
-　　the version of g++ should be 4.8.x or higher
+　　the version of g++ should be 4.8.x or higher<br>
 　　$ ./configure<br>
 　　$ make<br>
 ## usage
