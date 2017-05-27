@@ -1,4 +1,6 @@
 UTOMAKE_OPTIONS=foreign
+ACLOCAL_AMFLAGS = -I m4
+AUTOMAKE_OPTIONS = no-dependencies
 bin_PROGRAMS=crf_train crf_test
 crf_train_SOURCES=corpus.hpp  crf_test.hpp  crf_train.hpp  cube.hpp  example.hpp  idmap.hpp \
 				  labelmap.hpp  matrix.hpp  model.hpp  param.hpp  template.hpp \

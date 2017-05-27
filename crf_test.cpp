@@ -1,14 +1,15 @@
-#include<string>
-#include<fstream>
+#include <string>
+#include <fstream>
+#include <cmath>
 
-#include"crf_test.hpp"
-#include"template.hpp"
-#include"model.hpp"
-#include"corpus.hpp"
-#include"example.hpp"
-#include"matrix.hpp"
-#include"cube.hpp"
-#include"crf_train.hpp"
+#include "crf_test.hpp"
+#include "template.hpp"
+#include "model.hpp"
+#include "corpus.hpp"
+#include "example.hpp"
+#include "matrix.hpp"
+#include "cube.hpp"
+#include "crf_train.hpp"
 
 void crf_test(const std::string& test_file, const std::string& model_file, const std::string& output_file)
 {
